@@ -1,0 +1,60 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Deploy Cluster
+
+# Controls when the action will run. 
+on:
+  workflow_dispatch:
+    inputs:
+      adminUsername:
+        required: true
+        description: "OS Username"
+      adminPasswordOrKey:
+        required: true
+        description: "OS Password"
+      credentials:
+        required: true
+        default: "AZURE_CREDENTIALS"
+        description: The name of the GitHub Secret to use for deployment
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          # Paste output of `az ad sp create-for-rbac` as value of secret variable: AZURE_CREDENTIALS
+          creds: ${{ secrets[github.event.inputs.credentials] }}
+
+      # Runs a set of commands using the runners shell
+      - name: Deploy a VM running k3s
+        run: |
+          # Per-deploy secrets
+          ADMIN_USERNAME=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.adminUsername')
+          echo "::add-mask::$ADMIN_USERNAME"
+          ADMIN_PASSWORD=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.adminPasswordOrKey')
+          echo "::add-mask::$ADMIN_PASSWORD"
+
+          # Per-repository secrets
+          APP_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.clientId')
+          echo "::add-mask::$APP_ID"
+          PASSWORD=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.clientSecret')
+          echo "::add-mask::$PASSWORD"
+          TENANT_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.tenantId')
+          echo "::add-mask::$TENANT_ID"
+
+          RG=$(az group list -o tsv --query '[0].name')
+          echo "::add-mask::$RG"
+          SUBSCRIPTION_ID=$(az account show --query 'id' -o tsv)
+          echo "::add-mask::$SUBSCRIPTION_ID"
+
+          az deployment group create -g "$RG" -n "${{ github.event_name }}" --template-file "00-setup/azuredeploy.json" --parameters adminUsername="$ADMIN_USERNAME" adminPasswordOrKey="$ADMIN_PASSWORD" appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID"
