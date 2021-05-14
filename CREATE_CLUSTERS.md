@@ -17,6 +17,6 @@ echo "You will use this to allow GitHub to deploy the appropriate resources"
 echo $AZURE_CREDENTIALS
 ```
 
-3. Create a child repository from this template
+3. [Create a child repository](generate) from this template
 4. Add a secret with value of the `AZURE_CREDENTIALS` output
 5. Run the **Deploy Cluster** workflow
