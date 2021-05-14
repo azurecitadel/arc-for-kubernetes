@@ -356,7 +356,7 @@
             },
             "protectedSettings": {
             "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'))]",
-            "fileUris": ["https://raw.githubusercontent.com/jasoncabot-ms/arc-for-kubernetes/main/00-setup/scripts/install_k3s.sh"]  
+            "fileUris": ["https://raw.githubusercontent.com/jasoncabot-ms/arc-for-kubernetes/main/scripts/install_k3s.sh"]  
             }            
           }
         }                                  
