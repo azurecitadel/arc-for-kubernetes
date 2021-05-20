@@ -9,7 +9,7 @@ Create a few on-premises Kubernetes clusters. This is simulated using k3s by Ran
 LOCATION=uksouth
 
 RG_ID=$(az group create -n "rg-arc4k8s-${LOCATION}" -l "${LOCATION}" -o tsv --query 'id')
-AZURE_CREDENTIALS=$(az ad sp create-for-rbac -n "http://AzureArcK8s-${LOCATION}" --sdk-auth --role contributor --scopes $RG_ID)
+AZURE_CREDENTIALS=$(az ad sp create-for-rbac --sdk-auth --role contributor --scopes $RG_ID)
 
 echo "Copy this output into a GitHub secret with the name: 'AZURE_CREDENTIALS_${LOCATION^^}'"
 echo "You will use this to allow GitHub to deploy the appropriate resources"
