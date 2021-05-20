@@ -6,12 +6,6 @@ name: Deploy Cluster
 on:
   workflow_dispatch:
     inputs:
-      adminUsername:
-        required: true
-        description: "OS Username"
-      adminPasswordOrKey:
-        required: true
-        description: "OS Password"
       credentials:
         required: true
         default: "AZURE_CREDENTIALS"
@@ -38,12 +32,6 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Deploy a VM running k3s
         run: |
-          # Per-deploy secrets
-          ADMIN_USERNAME=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.adminUsername')
-          echo "::add-mask::$ADMIN_USERNAME"
-          ADMIN_PASSWORD=$(cat $GITHUB_EVENT_PATH | jq -r '.inputs.adminPasswordOrKey')
-          echo "::add-mask::$ADMIN_PASSWORD"
-
           # Per-repository secrets
           APP_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.clientId')
           echo "::add-mask::$APP_ID"
@@ -57,4 +45,4 @@ jobs:
           SUBSCRIPTION_ID=$(az account show --query 'id' -o tsv)
           echo "::add-mask::$SUBSCRIPTION_ID"
 
-          az deployment group create -g "$RG" -n "${{ github.event_name }}" --template-file "00-setup/azuredeploy.json" --parameters adminUsername="$ADMIN_USERNAME" adminPasswordOrKey="$ADMIN_PASSWORD" appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID"
+          az deployment group create -g "$RG" -n "${{ github.event_name }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID"
