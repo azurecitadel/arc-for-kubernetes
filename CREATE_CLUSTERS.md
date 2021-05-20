@@ -3,7 +3,7 @@
 Create a few on-premises Kubernetes clusters. This is simulated using k3s by Rancher running on a single Azure VM.
 
 1. Open [**Cloud Shell**](https://shell.azure.com/)
-2. Execute this code to create a resource group
+2. Execute this code to create a resource group and copythe credential output
 
 ```bash
 LOCATION=uksouth
