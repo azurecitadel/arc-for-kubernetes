@@ -17,6 +17,6 @@ echo "You will use this to allow GitHub to deploy the appropriate resources"
 echo $AZURE_CREDENTIALS
 ```
 
-3. [Create a child repository](//github.com/jasoncabot-ms/arc-for-kubernetes/generate) from this template
+3. [Create a child repository](//github.com/jasoncabot-ms/arc-for-kubernetes/generate) from this template, you can call it something like `arc-for-kubernetes` but the name doesn't matter
 4. Add a secret with value of the `AZURE_CREDENTIALS` output
 5. Run the **Deploy Cluster** workflow
