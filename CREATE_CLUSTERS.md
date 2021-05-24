@@ -15,6 +15,7 @@ echo "Copy this output into a GitHub secret with the name: 'AZURE_CREDENTIALS_${
 echo "You will use this to allow GitHub to deploy the appropriate resources"
 
 echo $AZURE_CREDENTIALS
+
 ```
 
 3. [Create a child repository](//github.com/jasoncabot-ms/arc-for-kubernetes/generate) from this template, you can call it something like `arc-for-kubernetes` but the name doesn't matter
@@ -25,3 +26,7 @@ As an example, your GitHub repository should appear like this
 ![Secret values](secret_example.png)
 
 5. Run the **Deploy Cluster** workflow from [GitHub Actions](../../actions)
+
+### Troubleshooting
+
+1. Ensure you create a Service Principal with appropriate access, especially note the `sdk-auth` for appropriate formatting of the secret and `scopes` for what you want the GitHub Action to be able to modify
