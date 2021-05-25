@@ -10,7 +10,7 @@ LOCATION=uksouth
 ```
 
 ```bash
-RG_ID=$(az group create -n "rg-arc4k8s-${LOCATION}" -l "${LOCATION}" -o tsv --query 'id')
+RG_ID=$(az group create -n "arc4k8s-${LOCATION}" -l "${LOCATION}" -o tsv --query 'id')
 AZURE_CREDENTIALS=$(az ad sp create-for-rbac --sdk-auth --role contributor --scopes $RG_ID)
 
 echo "Copy this output into a GitHub secret with the name: 'AZURE_CREDENTIALS_${LOCATION^^}'"
