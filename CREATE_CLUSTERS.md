@@ -7,7 +7,7 @@ Create a few on-premises Kubernetes clusters. This is simulated using k3s by Ran
 
 ```bash
 LOCATION=uksouth
-- or -
+# - or -
 LOCATION=westeurope
 ```
 
