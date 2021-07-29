@@ -41,7 +41,11 @@ jobs:
           SUBSCRIPTION_ID=$(az account show --query 'id' -o tsv)
           echo "::add-mask::$SUBSCRIPTION_ID"
 
-          az deployment group create -g "$RG" -n "${{ github.event_name }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID"
+          DEPLOYMENT=$(az deployment group create -g "$RG" -n "${{ github.event_name }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID" githubRepo="$GITHUB_REPOSITORY" branch="${GITHUB_REF##*/}")
+          SSH_COMMAND=$(echo $DEPLOYMENT | jq -r '.properties.outputs.sshCommand.value')
+
+          echo "You can now access your new VM running Kubernetes"
+          echo $SSH_COMMAND
           
           # Allow the VM to manage identity
           PRINCIPAL_ID=$(az vm list -g $RG --query '[].identity.principalId' -o tsv)

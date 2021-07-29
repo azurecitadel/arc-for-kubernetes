@@ -39,7 +39,7 @@ TENANT_ID=$5
 SUBSCRIPTION_ID=$7
 RESOURCE_GROUP=$8
 
-sudo rm -r "/etc/kubernetes/azure.json"
+sudo rm -rf "/etc/kubernetes/azure.json"
 
 echo "{
   \"cloud\": \"AzurePublicCloud\",
