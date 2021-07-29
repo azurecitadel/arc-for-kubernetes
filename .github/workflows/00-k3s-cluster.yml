@@ -39,4 +39,4 @@ jobs:
           SUBSCRIPTION_ID=$(az account show --query 'id' -o tsv)
           echo "::add-mask::$SUBSCRIPTION_ID"
 
-          az deployment group create -g "$RG" -n "${{ github.event_name }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID" subscriptionId="$SUBSCRIPTION_ID"
+          az deployment group create -g "$RG" -n "${{ github.event_name }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID"
