@@ -51,7 +51,7 @@
             "metadata": {
                 "description": "Unique SPN tenant ID"
             }
-        },                         
+        },
         "ubuntuOSVersion": {
             "type": "string",
             "defaultValue": "18.04-LTS",
@@ -102,7 +102,14 @@
             "defaultValue": {
                 "Project": "jumpstart_azure_arc_k8s"
             }
-        }        
+        },
+        "dnsLabelPrefix": {
+            "type": "string",
+            "defaultValue": "[toLower(format('{0}-{1}', parameters('vmName'), uniqueString(resourceGroup().id, parameters('vmName'))))]",
+            "metadata": {
+                "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
+            }
+        }
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
@@ -226,7 +233,7 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "443"
                         }
-                    }, 
+                    },
                     {
                         "name": "allow_k8s_kubelet",
                         "properties": {
@@ -252,7 +259,7 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "32323"
                         }
-                    }                                                                                                                       
+                    }
                 ]
             }
         },
@@ -286,6 +293,9 @@
             "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "Static",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsLabelPrefix')]"
+                },
                 "publicIPAddressVersion": "IPv4",
                 "idleTimeoutInMinutes": 4
             },
@@ -342,48 +352,52 @@
             }
         },
         {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(variables('vmName'),'/installscript_k3s')]",
-          "apiVersion": "2019-07-01",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-          ],
-          "properties": {
-            "publisher": "Microsoft.Azure.Extensions",
-            "type": "CustomScript",
-            "typeHandlerVersion": "2.1",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "timestamp": 123456789
-            },
-            "protectedSettings": {
-            "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'))]",
-            "fileUris": ["https://raw.githubusercontent.com/jasoncabot-ms/arc-for-kubernetes/main/scripts/install_k3s.sh"]  
-            }            
-          }
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/installscript_k3s')]",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "timestamp": 123456789
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'))]",
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/jasoncabot-ms/arc-for-kubernetes/main/scripts/install_k3s.sh"
+                    ]
+                }
+            }
         },
         {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(variables('vmName'),'/update_managed_identity')]",
-          "apiVersion": "2019-07-01",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), '/installscript_k3s')]"
-          ],
-          "properties": {
-            "publisher": "Microsoft.Azure.Extensions",
-            "type": "CustomScript",
-            "typeHandlerVersion": "2.1",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "timestamp": 123456789
-            },
-            "protectedSettings": {
-            "commandToExecute": "[concat('bash update_managed_identity.sh', ' ', parameters('tenantId'), ' ', parameters('subscriptionId'), ' ', resourceGroup().name]",
-            "fileUris": ["https://raw.githubusercontent.com/jasoncabot-ms/arc-for-kubernetes/main/scripts/update_managed_identity.sh"]  
-            }            
-          }
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/update_managed_identity')]",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), '/installscript_k3s')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "timestamp": 123456789
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('bash update_managed_identity.sh', ' ', parameters('tenantId'), ' ', parameters('subscriptionId'), ' ', resourceGroup().name]",
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/jasoncabot-ms/arc-for-kubernetes/main/scripts/update_managed_identity.sh"
+                    ]
+                }
+            }
         }
     ],
     "outputs": {
