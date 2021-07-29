@@ -22,7 +22,7 @@ chmod +x vars.sh
 
 publicIp=$(curl icanhazip.com)
 
-# Installing Rancer K3s single master cluster using k3sup
+# Installing Rancher K3s single master cluster using k3sup
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 curl -sLS https://get.k3sup.dev | sh
 sudo cp k3sup /usr/local/bin/k3sup
@@ -34,3 +34,17 @@ chown -R $adminUsername /home/${adminUsername}/.kube/
 # Installing Helm 3
 sudo snap install helm --classic
 
+# Set up Managed Identity
+TENANT_ID=$5
+SUBSCRIPTION_ID=$7
+RESOURCE_GROUP=$8
+
+sudo rm -r "/etc/kubernetes/azure.json"
+
+echo "{
+  \"cloud\": \"AzurePublicCloud\",
+  \"tenantId\": \"$TENANT_ID\",
+  \"subscriptionId\": \"$SUBSCRIPTION_ID\",
+  \"resourceGroup\": \"$RESOURCE_GROUP\",
+  \"useManagedIdentityExtension\": true
+}" | sudo tee /etc/kubernetes/azure.json

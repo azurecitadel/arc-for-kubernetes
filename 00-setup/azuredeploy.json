@@ -109,6 +109,20 @@
             "metadata": {
                 "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
             }
+        },
+        "githubRepo": {
+            "type": "string",
+            "defaultValue": "jasoncabot-ms/arc-for-kubernetes",
+            "metadata": {
+                "description": "The organisation and repository name from where this is deployed"
+            }
+        },
+        "branch": {
+            "type": "string",
+            "defaultValue": "main",
+            "metadata": {
+                "description": "The name of the branch in the githubRepo to use when running the install script"
+            }
         }
     },
     "variables": {
@@ -368,33 +382,9 @@
                     "timestamp": 123456789
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'))]",
+                    "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'), ' ', subscription().subscriptionId, ' ', resourceGroup().name)]",
                     "fileUris": [
-                        "https://raw.githubusercontent.com/jasoncabot-ms/arc-for-kubernetes/main/scripts/install_k3s.sh"
-                    ]
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmName'),'/update_managed_identity')]",
-            "apiVersion": "2019-07-01",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), '/installscript_k3s')]"
-            ],
-            "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.1",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "timestamp": 123456789
-                },
-                "protectedSettings": {
-                    "commandToExecute": "[concat('bash update_managed_identity.sh', ' ', parameters('tenantId'), ' ', subscription().subscriptionId, ' ', resourceGroup().name)]",
-                    "fileUris": [
-                        "https://raw.githubusercontent.com/jasoncabot-ms/arc-for-kubernetes/main/scripts/update_managed_identity.sh"
+                        "[concat('https://raw.githubusercontent.com/', parameters('githubRepo'), '/', parameters('branch'), '/scripts/install_k3s.sh')]"
                     ]
                 }
             }
