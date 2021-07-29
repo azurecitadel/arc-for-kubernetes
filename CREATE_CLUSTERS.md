@@ -29,7 +29,10 @@ echo $AZURE_CREDENTIALS
 As an example, your GitHub repository should appear like this
 ![Secret values](secret_example.png)
 
-5. Run the **Deploy Cluster** workflow from [GitHub Actions](../../actions)
+5. Run the **Deploy Cluster** workflow from [GitHub Actions](../../actions) specifying the secret name you added in step 4
+
+![run workflow](https://user-images.githubusercontent.com/51163690/127536787-11b0f118-e368-43c6-8926-61fcda7acbda.png)
+
 
 ### Troubleshooting
 
