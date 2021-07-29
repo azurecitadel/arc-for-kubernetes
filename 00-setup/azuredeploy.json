@@ -324,6 +324,9 @@
             "name": "[variables('vmName')]",
             "location": "[parameters('location')]",
             "tags": "[parameters('resourceTags')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
@@ -359,10 +362,7 @@
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPasswordOrKey')]",
                     "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
-                },
-                "identity": {
-                    "type": "SystemAssigned"
-                }
+                }                
             }
         },
         {
