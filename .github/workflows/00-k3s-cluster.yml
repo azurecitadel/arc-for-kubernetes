@@ -34,9 +34,16 @@ jobs:
           TENANT_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.tenantId')
           echo "::add-mask::$TENANT_ID"
 
+          # Assume that credentials have limited scope to a single resource group, so just pick the
+          # first thing we can access and use that as the resource group to deploy to :)
           RG=$(az group list -o tsv --query '[0].name')
           echo "::add-mask::$RG"
           SUBSCRIPTION_ID=$(az account show --query 'id' -o tsv)
           echo "::add-mask::$SUBSCRIPTION_ID"
 
           az deployment group create -g "$RG" -n "${{ github.event_name }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID"
+          
+          # Allow the VM to manage identity
+          PRINCIPAL_ID=$(az vm list -g $RG --query '[].identity.principalId' -o tsv)
+          az role assignment create --role "Managed Identity Operator" --assignee-object-id $PRINCIPAL_ID --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG
+          az role assignment create --role "Virtual Machine Contributor" --assignee-object-id $PRINCIPAL_ID --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG
