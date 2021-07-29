@@ -40,6 +40,7 @@ SUBSCRIPTION_ID=$7
 RESOURCE_GROUP=$8
 
 sudo rm -rf "/etc/kubernetes/azure.json"
+sudo mkdir -p "/etc/kubernetes/"
 
 echo "{
   \"cloud\": \"AzurePublicCloud\",
