@@ -1,4 +1,4 @@
 # Azure Arc for Kubernetes
 
-* [Create unmanaged clusters](CREATE_CLUSTERS.md)
-* [Deploy application resources](CREATE_AZURE_RESOURCES.md)
+* [Create unmanaged clusters](00-setup)
+* [Deploy application resources](01-app-setup)
