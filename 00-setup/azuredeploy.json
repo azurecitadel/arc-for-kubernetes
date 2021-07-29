@@ -166,7 +166,7 @@
                         "name": "allow_SSH",
                         "properties": {
                             "priority": 1001,
-                            "protocol": "TCP",
+                            "protocol": "Tcp",
                             "access": "Allow",
                             "direction": "Inbound",
                             "sourceAddressPrefix": "*",
@@ -179,7 +179,7 @@
                         "name": "allow_k8s_6443",
                         "properties": {
                             "priority": 1002,
-                            "protocol": "TCP",
+                            "protocol": "Tcp",
                             "access": "Allow",
                             "direction": "Inbound",
                             "sourceAddressPrefix": "*",
@@ -192,7 +192,7 @@
                         "name": "allow_k8s_80",
                         "properties": {
                             "priority": 1003,
-                            "protocol": "TCP",
+                            "protocol": "Tcp",
                             "access": "Allow",
                             "direction": "Inbound",
                             "sourceAddressPrefix": "*",
@@ -205,7 +205,7 @@
                         "name": "allow_k8s_8080",
                         "properties": {
                             "priority": 1004,
-                            "protocol": "TCP",
+                            "protocol": "Tcp",
                             "access": "Allow",
                             "direction": "Inbound",
                             "sourceAddressPrefix": "*",
@@ -218,7 +218,7 @@
                         "name": "allow_k8s_443",
                         "properties": {
                             "priority": 1005,
-                            "protocol": "TCP",
+                            "protocol": "Tcp",
                             "access": "Allow",
                             "direction": "Inbound",
                             "sourceAddressPrefix": "*",
@@ -231,7 +231,7 @@
                         "name": "allow_k8s_kubelet",
                         "properties": {
                             "priority": 1006,
-                            "protocol": "TCP",
+                            "protocol": "Tcp",
                             "access": "Allow",
                             "direction": "Inbound",
                             "sourceAddressPrefix": "*",
@@ -244,7 +244,7 @@
                         "name": "allow_traefik_lb_external",
                         "properties": {
                             "priority": 1007,
-                            "protocol": "TCP",
+                            "protocol": "Tcp",
                             "access": "Allow",
                             "direction": "Inbound",
                             "sourceAddressPrefix": "*",
@@ -280,12 +280,12 @@
             }
         },
         {
-            "type": "Microsoft.Network/publicIpAddresses",
+            "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-02-01",
             "name": "[variables('publicIpAddressName')]",
             "location": "[parameters('location')]",
             "properties": {
-                "publicIpAllocationMethod": "Static",
+                "publicIPAllocationMethod": "Static",
                 "publicIPAddressVersion": "IPv4",
                 "idleTimeoutInMinutes": 4
             },
@@ -311,7 +311,7 @@
                     "osDisk": {
                         "name": "[concat(variables('vmName'),'-OSDisk')]",
                         "caching": "ReadWrite",
-                        "createOption": "fromImage",
+                        "createOption": "FromImage",
                         "managedDisk": {
                             "storageAccountType": "[variables('osDiskType')]"
                         }
@@ -335,6 +335,9 @@
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPasswordOrKey')]",
                     "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+                },
+                "identity": {
+                    "type": "SystemAssigned"
                 }
             }
         },
@@ -359,7 +362,29 @@
             "fileUris": ["https://raw.githubusercontent.com/jasoncabot-ms/arc-for-kubernetes/main/scripts/install_k3s.sh"]  
             }            
           }
-        }                                  
+        },
+        {
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "name": "[concat(variables('vmName'),'/update_managed_identity')]",
+          "apiVersion": "2019-07-01",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), '/installscript_k3s')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.1",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "timestamp": 123456789
+            },
+            "protectedSettings": {
+            "commandToExecute": "[concat('bash update_managed_identity.sh', ' ', parameters('tenantId'), ' ', parameters('subscriptionId'), ' ', resourceGroup().name]",
+            "fileUris": ["https://raw.githubusercontent.com/jasoncabot-ms/arc-for-kubernetes/main/scripts/update_managed_identity.sh"]  
+            }            
+          }
+        }
     ],
     "outputs": {
         "adminUsername": {
