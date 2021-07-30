@@ -45,4 +45,4 @@ As an example, your GitHub repository should appear like this
 
 1. Ensure you create a Service Principal with appropriate access, especially note the `sdk-auth` for appropriate formatting of the secret and `scopes` for what you want the GitHub Action to be able to modify
 2. If you get a status code 400 error when creating the Service Principal, try to login to the Azure CLI again using `az login`
-3. If your deployment fails, look at the logs and check for `The template deployment failed with error` and `The requested size for resource is currently not available in location '...' zones '...' for subscription '...'. Please try another size or deploy to a different location or zones. See https://aka.ms/azureskunotavailable`
+3. If your deployment fails, look at the logs and check for `The template deployment failed with error` and `The requested size for resource is currently not available in location '...' zones '...' for subscription '...'. Please try another size or deploy to a different location or zones. See https://aka.ms/azureskunotavailable` just **choose another region** with the sku of `Standard_D4s_v3` available. For example `uksouth` and `westeurope`
