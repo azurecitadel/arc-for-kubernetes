@@ -25,6 +25,7 @@ jobs:
           creds: ${{ secrets[github.event.inputs.credentials] }}
 
       - name: Deploy a VM running k3s
+        id: create_vm
         run: |
           # Per-repository secrets
           APP_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.clientId')
@@ -43,11 +44,14 @@ jobs:
 
           DEPLOYMENT=$(az deployment group create -g "$RG" -n "${{ github.event_name }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID" githubRepo="$GITHUB_REPOSITORY" branch="${GITHUB_REF##*/}")
           SSH_COMMAND=$(echo $DEPLOYMENT | jq -r '.properties.outputs.sshCommand.value')
-
-          echo "You can now access your new VM running Kubernetes"
-          echo $SSH_COMMAND
+          echo "::set-output name=ssh_command::$SSH_COMMAND"
           
           # Allow the VM to manage identity
           PRINCIPAL_ID=$(az vm list -g $RG --query '[].identity.principalId' -o tsv)
           az role assignment create --role "Managed Identity Operator" --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG
           az role assignment create --role "Virtual Machine Contributor" --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG
+
+      - name: Show SSH connection
+        run: |
+          echo "You can now access your new VM running Kubernetes"
+          echo ${{ steps.create_vm.outputs.ssh_command }}
