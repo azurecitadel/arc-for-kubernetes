@@ -1,0 +1,52 @@
+# This workflow will deploy an unmanaged Kubernetes k3s cluster running on an Azure Virtual Machine
+
+name: Deploy Cluster
+
+# Triggered manually
+on:
+  workflow_dispatch:
+    inputs:
+      credentials:
+        required: true
+        default: "AZURE_CREDENTIALS"
+        description: The name of the GitHub Secret to use for deployment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          # See: https://github.com/jasoncabot-ms/arc-for-kubernetes/tree/main/00-setup
+          creds: ${{ secrets[github.event.inputs.credentials] }}
+
+      - name: Deploy Azure Resources
+        id: deploy_infrastructure
+        run: |
+          # Per-repository secrets
+          APP_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.clientId')
+          echo "::add-mask::$APP_ID"
+          PASSWORD=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.clientSecret')
+          echo "::add-mask::$PASSWORD"
+          TENANT_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.tenantId')
+          echo "::add-mask::$TENANT_ID"
+
+          # Assume that credentials have limited scope to a single resource group, so just pick the
+          # first thing we can access and use that as the resource group to deploy to :)
+          RG=$(az group list -o tsv --query '[0].name')
+          echo "::add-mask::$RG"
+          SUBSCRIPTION_ID=$(az account show --query 'id' -o tsv)
+          echo "::add-mask::$SUBSCRIPTION_ID"
+
+          DEPLOYMENT=$(az deployment group create -g "$RG" -n "${{ github.event_name }}-${GITHUB_SHA:0:7}-${{ github.run_id }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID" githubRepo="$GITHUB_REPOSITORY" branch="${GITHUB_REF##*/}")
+          SSH_COMMAND=$(echo $DEPLOYMENT | jq -r '.properties.outputs.sshCommand.value')
+          echo "::set-output name=ssh_command::$SSH_COMMAND"
+          
+          # Allow the VM to manage identity
+          PRINCIPAL_ID=$(az vm list -g $RG --query '[].identity.principalId' -o tsv)
+          az role assignment create --role "Managed Identity Operator" --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG
+          az role assignment create --role "Virtual Machine Contributor" --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG
