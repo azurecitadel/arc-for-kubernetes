@@ -49,5 +49,5 @@ jobs:
           
           # Allow the VM to manage identity
           PRINCIPAL_ID=$(az vm list -g $RG --query '[].identity.principalId' -o tsv)
-          az role assignment create --role "Managed Identity Operator" --assignee-object-id $PRINCIPAL_ID --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG
-          az role assignment create --role "Virtual Machine Contributor" --assignee-object-id $PRINCIPAL_ID --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG
+          az role assignment create --role "Managed Identity Operator" --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG
+          az role assignment create --role "Virtual Machine Contributor" --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG
