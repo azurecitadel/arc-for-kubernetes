@@ -15,13 +15,27 @@ No secret credentials are stored or created during deployment as all authenticat
 1. Determine who will be the **database administrator**
 2. Find the **Object ID** in Azure AD that corresponds to your identity
 
+```bash
+az ad signed-in-user show --query 'objectId' -o tsv # aad_admin_objectid
+```
+
 ## Storage
 
 1. Nothing special is required here
 
 ## Application Registration
 
-1. You will need to take note of your **Tenant ID** and **Application ID**
+1. Create your Application and note the **Application ID**
+
+```bash
+az ad app create --display-name="Item Reviewer" \
+    --available-to-other-tenants=true \
+    --query "appId" -o tsv
+```
+
+2. Update the application manifest and set `accessTokenAcceptedVersion` to 2
+3. Add `Reply URLs` for each region
+
 
 # Troubleshooting
 
