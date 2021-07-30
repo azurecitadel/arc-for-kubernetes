@@ -24,6 +24,10 @@ jobs:
           # See: https://github.com/jasoncabot-ms/arc-for-kubernetes/blob/main/CREATE_CLUSTERS.md
           creds: ${{ secrets[github.event.inputs.credentials] }}
 
+      - name: Get Version
+        id: get_version
+        run: echo ::set-output name=short_sha::$(echo $GITHUB_REF | cut -d / -f 4)
+        
       - name: Deploy a VM running k3s
         id: create_vm
         run: |
@@ -42,7 +46,7 @@ jobs:
           SUBSCRIPTION_ID=$(az account show --query 'id' -o tsv)
           echo "::add-mask::$SUBSCRIPTION_ID"
 
-          DEPLOYMENT=$(az deployment group create -g "$RG" -n "${{ github.event_name }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID" githubRepo="$GITHUB_REPOSITORY" branch="${GITHUB_REF##*/}")
+          DEPLOYMENT=$(az deployment group create -g "$RG" -n "${{ github.event_name }}-${{ steps.get_version.outputs.short_sha }}-${{ github.run_id }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID" githubRepo="$GITHUB_REPOSITORY" branch="${GITHUB_REF##*/}")
           SSH_COMMAND=$(echo $DEPLOYMENT | jq -r '.properties.outputs.sshCommand.value')
           echo "::set-output name=ssh_command::$SSH_COMMAND"
           
