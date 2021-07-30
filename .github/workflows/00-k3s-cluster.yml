@@ -21,7 +21,7 @@ jobs:
       - name: Azure Login
         uses: Azure/login@v1
         with:
-          # See: https://github.com/jasoncabot-ms/arc-for-kubernetes/blob/main/CREATE_CLUSTERS.md
+          # See: https://github.com/jasoncabot-ms/arc-for-kubernetes/tree/main/00-setup
           creds: ${{ secrets[github.event.inputs.credentials] }}
 
       - name: Deploy a VM running k3s
