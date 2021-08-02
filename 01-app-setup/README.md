@@ -54,7 +54,7 @@ echo "Application ID: ${APP_ID}"
 
 ## 3. Create SQL Schema
 
-All infrastructure will now be provisioned so it's time to create the DB schema. The SQL Server we deployed has [Azure AD Authentication Only](https://docs.microsoft.com/azure/azure-sql/database/authentication-azure-ad-only-authentication?tabs=azure-cli) so without allowing admin access to a group that the GitHub Action also has access to we can't yet deploy changes automatically. This mean you will need to log in to your server manually and deploy a few resources to allow the application to work.
+All infrastructure will now be provisioned so it's time to create the DB schema. The SQL Server we deployed has [Azure AD Authentication Only](https://docs.microsoft.com/azure/azure-sql/database/authentication-azure-ad-only-authentication?tabs=azure-cli) so without allowing admin access to a group that the GitHub Action also has access to we can't yet deploy changes automatically. This means you will need to log in to your server manually and deploy a few resources to allow the application to work.
 
 1. Download [Azure Data Studio](https://azure.microsoft.com/services/developer-tools/data-studio/)
 2. Find the **connection details** in the output of your GitHub Action run
