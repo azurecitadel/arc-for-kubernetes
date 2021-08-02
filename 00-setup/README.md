@@ -36,7 +36,7 @@ As an example, your GitHub repository should appear like this
 
 ## Deploy Kubernetes using GitHub
 
-5. (recommended) Find your Public SSH Key for access to the cluster by running `cat ~/.ssh/id_rsa.pub`
+5. (recommended) Find your Public SSH Key for access to the cluster by running `cat ~/.ssh/id_*.pub`
 >  If you haven't got one, [generate a new public SSH key](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key) `ssh-keygen -t ed25519 -C "your_email@example.com"`
 6. Run the **Deploy Cluster** workflow from [GitHub Actions](../../actions) specifying the secret name you added in step 4
 
