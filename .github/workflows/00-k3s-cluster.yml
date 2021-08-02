@@ -41,7 +41,8 @@ jobs:
           echo "::add-mask::$PASSWORD"
           TENANT_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.tenantId')
           echo "::add-mask::$TENANT_ID"
-          echo "::add-mask::${{ github.event.inputs.adminPasswordOrKey }}"
+          ADMIN_PASSWORD_OR_KEY=${{ github.event.inputs.adminPasswordOrKey }}
+          echo "::add-mask::$ADMIN_PASSWORD_OR_KEY"
 
           # Assume that credentials have limited scope to a single resource group, so just pick the
           # first thing we can access and use that as the resource group to deploy to :)

@@ -133,7 +133,7 @@
         "subnetAddressPrefix": "10.1.0.0/24",
         "addressPrefix": "10.1.0.0/16",
         "linuxConfiguration": {
-            "disablePasswordAuthentication": false,
+            "disablePasswordAuthentication": "[if(equals(parameters('authenticationType'), 'password'), 'false', 'true')]",
             "ssh": {
                 "publicKeys": [
                     {
