@@ -62,8 +62,10 @@ jobs:
 
           echo "::set-output name=apiIdentityResourceId::$(echo $DEPLOYMENT | jq -r '.properties.outputs.apiIdentityResourceId.value')"
           echo "::set-output name=apiIdentityClientId::$(echo $DEPLOYMENT | jq -r '.properties.outputs.apiIdentityClientId.value')"
+          echo "::set-output name=apiIdentityName::$(echo $DEPLOYMENT | jq -r '.properties.outputs.apiIdentityName.value')"
           echo "::set-output name=uiIdentityResourceId::$(echo $DEPLOYMENT | jq -r '.properties.outputs.uiIdentityResourceId.value')"
           echo "::set-output name=uiIdentityClientId::$(echo $DEPLOYMENT | jq -r '.properties.outputs.uiIdentityClientId.value')"
+          echo "::set-output name=uiIdentityName::$(echo $DEPLOYMENT | jq -r '.properties.outputs.uiIdentityName.value')"
           echo "::set-output name=sqlConnectionString::\"$SQL_CONNECTION_STRING\""
           echo "::set-output name=storageURI::$(echo $DEPLOYMENT | jq -r '.properties.outputs.storageURI.value')"
           echo "::set-output name=urlPrefix::$(az network public-ip list -g $RG --query '[].join(`.`, [dnsSettings.domainNameLabel,location])' -o tsv)"
@@ -111,9 +113,8 @@ jobs:
 
       - name: Next Steps
         run: |
-          IDENTITY_NAME=$(az ad sp show --id ${{ steps.deploy_infrastructure.outputs.apiIdentityClientId }} --query 'displayName' -o tsv)
           echo "Connect to your SQL server using the connection string '${{ steps.deploy_infrastructure.outputs.sqlConnectionString }}'"
           echo "Run the following SQL to allow access from the API"
-          echo "CREATE USER [$IDENTITY_NAME] FROM EXTERNAL PROVIDER;"
-          echo "ALTER ROLE db_datareader ADD MEMBER [$IDENTITY_NAME];"
+          echo "CREATE USER [${{ steps.deploy_infrastructure.outputs.apiIdentityName }}] FROM EXTERNAL PROVIDER;"
+          echo "ALTER ROLE db_datareader ADD MEMBER [$${{ steps.deploy_infrastructure.outputs.apiIdentityName }}];"
           cat ./scripts/schema.sql

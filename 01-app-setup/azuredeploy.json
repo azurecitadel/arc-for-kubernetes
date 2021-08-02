@@ -151,6 +151,10 @@
             "type": "string",
             "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('id-api'))).clientId]"
         },
+        "apiIdentityName": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('id-api'))).displayName]"
+        },
         "uiIdentityResourceId": {
             "type": "string",
             "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('id-ui'))]"
@@ -158,6 +162,10 @@
         "uiIdentityClientId": {
             "type": "string",
             "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('id-ui'))).clientId]"
+        },
+        "uiIdentityName": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('id-ui'))).displayName]"
         },
         "sqlConnectionString": {
             "type": "string",
