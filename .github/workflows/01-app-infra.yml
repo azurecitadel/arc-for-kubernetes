@@ -44,8 +44,10 @@ jobs:
           echo "::add-mask::$PASSWORD"
           TENANT_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.tenantId')
           echo "::add-mask::$TENANT_ID"
-          echo "::add-mask::${{ github.event.inputs.aad_admin_objectid }}"
-          echo "::add-mask::${{ github.event.inputs.app_id }}"
+          AAD_ADMIN_OBJECTID=${{ github.event.inputs.aad_admin_objectid }}
+          echo "::add-mask::$AAD_ADMIN_OBJECTID"
+          APPLICATION_ID=${{ github.event.inputs.app_id }}
+          echo "::add-mask::$APPLICATION_ID"
 
           # Assume that credentials have limited scope to a single resource group, so just pick the
           # first thing we can access and use that as the resource group to deploy to :)
@@ -75,6 +77,13 @@ jobs:
           PRINCIPAL_ID=$(az resource show --id ${{ steps.deploy_infrastructure.outputs.apiIdentityResourceId }} --query 'properties.principalId' -o tsv)
           az role assignment create --role "Storage Blob Data Contributor" --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal --scope $STORAGE
 
+      - name: Workaround for helm not supporting comma in set command
+        id: helm_workaround
+        run: |
+          WORKAROUND=${{ steps.deploy_infrastructure.outputs.sqlConnectionString }}
+          WORKAROUND=${WORKAROUND/,/\\\,} # https://github.com/helm/helm/issues/1556
+          echo "::set-output name=sqlConnectionString::$WORKAROUND"
+
       - name: Create App Specific Kubernetes Manifests
         uses: Azure/k8s-bake@v1
         id: bake
@@ -86,7 +95,7 @@ jobs:
             applicationClientID:${{ github.event.inputs.app_id }}
             urlPrefix:${{ steps.deploy_infrastructure.outputs.urlPrefix }}
             storageURI:${{ steps.deploy_infrastructure.outputs.storageURI }}
-            sqlConnectionString:${{ steps.deploy_infrastructure.outputs.sqlConnectionString }}
+            sqlConnectionString:${{ steps.helm_workaround.outputs.sqlConnectionString }}
             identity.api.resource:${{ steps.deploy_infrastructure.outputs.apiIdentityResourceId }}
             identity.api.client:${{ steps.deploy_infrastructure.outputs.apiIdentityClientId }}
             identity.ui.resource:${{ steps.deploy_infrastructure.outputs.uiIdentityResourceId }}
