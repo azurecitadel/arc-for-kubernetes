@@ -42,7 +42,7 @@ jobs:
           TENANT_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.tenantId')
           echo "::add-mask::$TENANT_ID"
           ADMIN_PASSWORD_OR_KEY=$(jq -r '.inputs.adminPasswordOrKey' $GITHUB_EVENT_PATH)
-          echo "::add-mask::'$ADMIN_PASSWORD_OR_KEY'"
+          echo "::add-mask::\"$ADMIN_PASSWORD_OR_KEY\""
 
           # Assume that credentials have limited scope to a single resource group, so just pick the
           # first thing we can access and use that as the resource group to deploy to :)
@@ -51,7 +51,7 @@ jobs:
           SUBSCRIPTION_ID=$(az account show --query 'id' -o tsv)
           echo "::add-mask::$SUBSCRIPTION_ID"
 
-          DEPLOYMENT=$(az deployment group create -g "$RG" -n "${{ github.event_name }}-${GITHUB_SHA:0:7}-${{ github.run_id }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID" adminPasswordOrKey="${{ github.event.inputs.adminPasswordOrKey }}" authenticationType="${{ github.event.inputs.authenticationType }}" githubRepo="$GITHUB_REPOSITORY" branch="${GITHUB_REF##*/}")
+          DEPLOYMENT=$(az deployment group create -g "$RG" -n "${{ github.event_name }}-${GITHUB_SHA:0:7}-${{ github.run_id }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID" adminPasswordOrKey="$ADMIN_PASSWORD_OR_KEY" authenticationType="${{ github.event.inputs.authenticationType }}" githubRepo="$GITHUB_REPOSITORY" branch="${GITHUB_REF##*/}")
           SSH_COMMAND=$(echo $DEPLOYMENT | jq -r '.properties.outputs.sshCommand.value')
           echo "::set-output name=ssh_command::$SSH_COMMAND"
           

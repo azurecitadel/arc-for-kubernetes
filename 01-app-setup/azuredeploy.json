@@ -55,6 +55,14 @@
         "aad_only_auth": {
             "defaultValue": true,
             "type": "Bool"
+        },
+        "id-api": {
+            "type": "string",
+            "defaultValue": "[concat('id-api-', uniqueString(resourceGroup().id))]"
+        },
+        "id-ui": {
+            "type": "string",
+            "defaultValue": "[concat('id-ui-', uniqueString(resourceGroup().id))]"
         }
     },
     "resources": [
@@ -100,13 +108,13 @@
         {
             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
             "apiVersion": "2018-11-30",
-            "name": "id-reviewer-api",
+            "name": "[parameters('id-api')]",
             "location": "[parameters('location')]"
         },
         {
             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
             "apiVersion": "2018-11-30",
-            "name": "id-reviewer-ui",
+            "name": "[parameters('id-ui')]",
             "location": "[parameters('location')]"
         },
         {
@@ -137,19 +145,19 @@
     "outputs": {
         "apiIdentityResourceId": {
             "type": "string",
-            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'id-reviewer-api')]"
+            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('id-api'))]"
         },
         "apiIdentityClientId": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'id-reviewer-api')).clientId]"
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('id-api'))).clientId]"
         },
         "uiIdentityResourceId": {
             "type": "string",
-            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'id-reviewer-ui')]"
+            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('id-ui'))]"
         },
         "uiIdentityClientId": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'id-reviewer-ui')).clientId]"
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('id-ui'))).clientId]"
         },
         "sqlConnectionString": {
             "type": "string",

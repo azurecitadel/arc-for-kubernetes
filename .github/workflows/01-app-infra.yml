@@ -56,12 +56,13 @@ jobs:
           echo "::add-mask::$SUBSCRIPTION_ID"
 
           DEPLOYMENT=$(az deployment group create -g "$RG" -n "${{ github.event_name }}-${GITHUB_SHA:0:7}-${{ github.run_id }}" --template-file "01-app-setup/azuredeploy.json" --parameters aad_admin_objectid="${{ github.event.inputs.aad_admin_objectid }}")
+          SQL_CONNECTION_STRING=$(echo $DEPLOYMENT | jq -r '.properties.outputs.sqlConnectionString.value')
 
           echo "::set-output name=apiIdentityResourceId::$(echo $DEPLOYMENT | jq -r '.properties.outputs.apiIdentityResourceId.value')"
           echo "::set-output name=apiIdentityClientId::$(echo $DEPLOYMENT | jq -r '.properties.outputs.apiIdentityClientId.value')"
           echo "::set-output name=uiIdentityResourceId::$(echo $DEPLOYMENT | jq -r '.properties.outputs.uiIdentityResourceId.value')"
           echo "::set-output name=uiIdentityClientId::$(echo $DEPLOYMENT | jq -r '.properties.outputs.uiIdentityClientId.value')"
-          echo "::set-output name=sqlConnectionString::$(echo $DEPLOYMENT | jq -r '.properties.outputs.sqlConnectionString.value')"
+          echo "::set-output name=sqlConnectionString::\"$SQL_CONNECTION_STRING\""
           echo "::set-output name=storageURI::$(echo $DEPLOYMENT | jq -r '.properties.outputs.storageURI.value')"
           echo "::set-output name=urlPrefix::$(az network public-ip list -g $RG --query '[].join(`.`, [dnsSettings.domainNameLabel,location])' -o tsv)"
 
@@ -98,3 +99,12 @@ jobs:
         with:
           name: 'App Manifest Bundle'
           path: ${{ steps.bake.outputs.manifestsBundle }}
+
+      - name: Next Steps
+        run: |
+          IDENTITY_NAME=$(az ad sp show --id ${{ steps.deploy_infrastructure.outputs.apiIdentityClientId }} --query 'displayName' -o tsv)
+          echo "Connect to your SQL server using the connection string '${{ steps.deploy_infrastructure.outputs.sqlConnectionString }}'"
+          echo "Run the following SQL to allow access from the API"
+          echo "CREATE USER [$IDENTITY_NAME] FROM EXTERNAL PROVIDER;"
+          echo "ALTER ROLE db_datareader ADD MEMBER [$IDENTITY_NAME];"
+          cat ./scripts/schema.sql
