@@ -12,7 +12,7 @@ on:
         description: The name of the GitHub Secret to use for deployment
       aad_admin_objectid:
         required: true
-        description: The Object ID of the Azure AD admin
+        description: The Azure AD Object ID of the SQL Server Database Administrator
       k8s_namespace:
         required: true
         default: app-dev-arc
