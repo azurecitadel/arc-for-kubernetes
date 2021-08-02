@@ -69,8 +69,9 @@ All infrastructure will now be provisioned so it's time to create the DB schema.
 6. Create [contained users](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/tutorial-windows-vm-access-sql#create-contained-user) by executing the following code
 
 ```sql
-CREATE USER [id-reviewer-api] FROM EXTERNAL PROVIDER;
-ALTER ROLE db_datareader ADD MEMBER [id-reviewer-api];
+# Replace ... with the output from the GitHub Action
+CREATE USER [...] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [...];
 ```
 
 # Troubleshooting
