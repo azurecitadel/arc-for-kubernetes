@@ -65,7 +65,7 @@ jobs:
         run: |
           # Register Application
           APP_NAME="Item Reviewer ${GITHUB_SHA:0:7}"
-          APP=$(az ad app create --display-name=$APP_NAME --available-to-other-tenants=true)
+          APP=$(az ad app create --display-name="$APP_NAME" --available-to-other-tenants=true)
           APP_ID=$(echo $APP | jq -r .appId)
           OBJECT_ID=$(echo $APP | jq -r .objectId)
 
