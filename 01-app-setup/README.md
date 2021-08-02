@@ -22,13 +22,13 @@ az ad signed-in-user show --query 'objectId' -o tsv # aad_admin_objectid
 
 > Note: You would ideally use a group identity here rather than a single user, for example a group called "Azure Arc SQL Server Admins" however creating an Azure AD group is a privileged operation that you may not have access to
 
-3. Run the **Deploy Infrastructure** workflow from [GitHub Actions](../../actions) specifying the secret name you added previously e.g. `AZURE_CREDENTIALS_WESTEUROPE`
-
 ## 2. User Authentication
 
-To allow users to sign-in to your deployment of the application you will need to register a new application with Azure AD since it requires unique and specific Reply URLs (the allowed set of URIs that a user is redirected to after signing into Azure AD)
+To allow users to sign-in to your deployment of the application you will need to register a new application with Azure AD and take note of it's **Application ID**
 
-You only need to do this once. The same application can be shared for all running instances of the Reviewer application provided that you include all Reply URLs
+You can re-use the same Application ID in multiple regions, runs and deployments. The same application can be shared for all running instances of the Reviewer application.
+
+The only reason you must create a new application is so that you have control over the **Reply URLs** and can add your own values to redirect to **your** applications after signing in with Azure AD.
 
 ```
 # Register Application
@@ -51,6 +51,13 @@ az rest \
 echo "Application ID: ${APP_ID}"
 
 ```
+
+## 3. Create Application Manifests
+
+1. Run the **Deploy Infrastructure** workflow from [GitHub Actions](../../actions) specifying the secret name you added previously e.g. `AZURE_CREDENTIALS_WESTEUROPE` and the values above
+2. Download the generated manifest bundle from the run artifacts
+
+> Note: This doesn't actually deploy the application to your cluster as we are controlling that with GitOps. It does however generate the set of manifests that you can directly commit to an Application Developer owned repository.
 
 ## 3. Create SQL Schema
 
