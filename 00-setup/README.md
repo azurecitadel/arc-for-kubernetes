@@ -42,6 +42,8 @@ As an example, your GitHub repository should appear like this
 
 ![run workflow](https://user-images.githubusercontent.com/51163690/127879459-6cfb03da-71a5-483c-923d-a18423ec6bb4.png)
 
+**This usually takes about 2 minutes to run**
+
 ### Troubleshooting
 
 1. Ensure you create a Service Principal with appropriate access, especially note the `sdk-auth` for appropriate formatting of the secret and `scopes` for what you want the GitHub Action to be able to modify
