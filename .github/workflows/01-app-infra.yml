@@ -113,7 +113,8 @@ jobs:
 
       - name: Next Steps
         run: |
-          echo "Connect to your SQL server using the connection string ${{ steps.deploy_infrastructure.outputs.sqlConnectionString }}"
+          CONN=${{ steps.deploy_infrastructure.outputs.sqlConnectionString }}
+          echo "Connect to your SQL server using the connection string $CONN"
           echo "Run the following SQL to allow access from the API"
           echo "CREATE USER [${{ steps.deploy_infrastructure.outputs.apiIdentityName }}] FROM EXTERNAL PROVIDER;"
           echo "ALTER ROLE db_datareader ADD MEMBER [${{ steps.deploy_infrastructure.outputs.apiIdentityName }}];"
