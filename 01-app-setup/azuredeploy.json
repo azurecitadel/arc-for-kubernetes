@@ -153,7 +153,7 @@
         },
         "apiIdentityName": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('id-api'))).displayName]"
+            "value": "[parameters('id-api')]"
         },
         "uiIdentityResourceId": {
             "type": "string",
@@ -165,7 +165,7 @@
         },
         "uiIdentityName": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('id-ui'))).displayName]"
+            "value": "[parameters('id-ui')]"
         },
         "sqlConnectionString": {
             "type": "string",
