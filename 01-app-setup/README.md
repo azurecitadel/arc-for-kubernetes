@@ -29,7 +29,27 @@ To allow users to sign-in to your deployment of the application you will need to
 
 You only need to do this once. The same application can be shared for all running instances of the Reviewer application provided that you include all Reply URLs
 
-This step should have been automatically handled as part of the GitHub action. Look in Azure AD for an application called "Item Reviewer ......" and check the Reply URLs. Looking in the output log of the GitHub Action run should give you a good indication of the work done.
+```
+# Register Application
+#   reply-urls: Space separated list of redirect URLs - you should add one for each deployment of your application
+APP=$(az ad app create \
+    --display-name="Item Reviewer" \
+    --reply-urls http://localhost:3000 http://localhost:5000 \
+    --available-to-other-tenants=true)
+APP_ID=$(echo $APP | jq -r .appId)
+OBJECT_ID=$(echo $APP | jq -r .objectId)
+
+# Update requestedAccessTokenVersion to v2
+az rest \
+    --method PATCH \
+    --headers "Content-Type=application/json" \
+    --uri "https://graph.microsoft.com/v1.0/applications/${OBJECT_ID}" \
+    --body '{"api":{"requestedAccessTokenVersion":2}}'
+
+# You will need this when running the Infrastructure deployment
+echo "Application ID: ${APP_ID}"
+
+```
 
 # Application Setup
 

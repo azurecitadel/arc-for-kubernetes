@@ -13,6 +13,9 @@ on:
       aad_admin_objectid:
         required: true
         description: The Azure AD Object ID of the SQL Server Database Administrator
+      app_id:
+        required: true
+        description: The Item Reviewer Application (client) ID from your Azure AD tenant
       k8s_namespace:
         required: true
         default: app-dev-arc
@@ -41,6 +44,8 @@ jobs:
           echo "::add-mask::$PASSWORD"
           TENANT_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.tenantId')
           echo "::add-mask::$TENANT_ID"
+          echo "::add-mask::${{ github.event.inputs.aad_admin_objectid }}"
+          echo "::add-mask::${{ github.event.inputs.app_id }}"
 
           # Assume that credentials have limited scope to a single resource group, so just pick the
           # first thing we can access and use that as the resource group to deploy to :)
@@ -60,29 +65,6 @@ jobs:
           echo "::set-output name=storageURI::$(echo $DEPLOYMENT | jq -r '.properties.outputs.storageURI.value')"
           echo "::set-output name=urlPrefix::$(az network public-ip list -g $RG --query '[].join(`.`, [dnsSettings.domainNameLabel,location])' -o tsv)"
 
-      - name: Register Application for Authentication
-        id: app_registration
-        run: |
-          # Register Application
-          APP_NAME="Item Reviewer ${GITHUB_SHA:0:7}"
-          APP=$(az ad app create --display-name="$APP_NAME" --available-to-other-tenants=true)
-          APP_ID=$(echo $APP | jq -r .appId)
-          OBJECT_ID=$(echo $APP | jq -r .objectId)
-
-          # Update requestedAccessTokenVersion to v2
-          az rest \
-              --method PATCH \
-              --headers "Content-Type=application/json" \
-              --uri "https://graph.microsoft.com/v1.0/applications/${OBJECT_ID}" \
-              --body '{"api":{"requestedAccessTokenVersion":2}}'
-
-          # Append our newly created reply host to the existing set (if any exist)
-          REPLY_HOST="https://${{ steps.deploy_infrastructure.outputs.urlPrefix }}.cloudapp.azure.com/"
-          HOSTS="$(az ad app show --id $APP_ID --query '[replyUrls]' -o tsv) $REPLY_HOST"
-          az ad app update --id $APP_ID --reply-urls $HOSTS
-
-          echo "::set-output name=appId::$APP_ID"
-
       - name: Role Assignments
         run: |
           RESOURCE_GROUP=${{ steps.deploy_infrastructure.outputs.resource_group }}
@@ -100,7 +82,7 @@ jobs:
           helmChart: './app-config/'
           overrides: |
             namespace:${{ github.event.inputs.k8s_namespace }}
-            applicationClientID:${{ steps.app_registration.outputs.appId }}
+            applicationClientID:${{ github.event.inputs.app_id }}
             urlPrefix:${{ steps.deploy_infrastructure.outputs.urlPrefix }}
             storageURI:${{ steps.deploy_infrastructure.outputs.storageURI }}
             sqlConnectionString:${{ steps.deploy_infrastructure.outputs.sqlConnectionString }}
