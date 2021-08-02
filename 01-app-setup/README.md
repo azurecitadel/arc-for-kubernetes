@@ -59,8 +59,11 @@ All infrastructure will now be provisioned so it's time to create the DB schema.
 1. Download [Azure Data Studio](https://azure.microsoft.com/services/developer-tools/data-studio/)
 2. Find the **connection details** in the output of your GitHub Action run
 3. Connect to SQL Server as the **database administrator** (Azure AD Admin specified earlier)
-4. Deploy the [Application Schema](../scripts/schema.sql)
-5. Create [contained users](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/tutorial-windows-vm-access-sql#create-contained-user) by executing the following code
+
+![connect to your database](https://user-images.githubusercontent.com/51163690/127883966-cbba4e5a-4239-4e76-a71e-41685cb4fe67.png)
+
+5. Deploy the [Application Schema](../scripts/schema.sql)
+6. Create [contained users](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/tutorial-windows-vm-access-sql#create-contained-user) by executing the following code
 
 ```sql
 CREATE USER [id-reviewer-api] FROM EXTERNAL PROVIDER;
