@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+    "contentVersion": "1.0.0.1",
     "parameters": {
         "location": {
             "type": "string",
@@ -9,8 +9,23 @@
                 "description": "Location for all resources."
             }
         },
+        "server": {
+            "type": "string",
+            "defaultValue": "[uniqueString('sql', resourceGroup().id)]",
+            "metadata": {
+                "description": "The name of the SQL logical server."
+            }
+        },
+        "storageAccountName": {
+            "type": "string",
+            "defaultValue": "[uniqueString('storage', resourceGroup().id)]",
+            "metadata": {
+                "description": "Specifies the name of the Azure Storage account."
+            }
+        },
         "aad_admin_name": {
             "type": "String",
+            "defaultValue": "arcdemo",
             "metadata": {
                 "description": "The name of the Azure AD admin for the SQL server."
             }
@@ -38,31 +53,15 @@
             "type": "String"
         },
         "aad_only_auth": {
-            "type": "Bool",
-            "defaultValue": true
-        },
-        "sqlDBName": {
-            "type": "String",
-            "defaultValue": "db-reviewer",
-            "metadata": {
-                "description": "The name of the SQL Database."
-            }
-        },
-        "serverName": {
-            "type": "string",
-            "defaultValue": "[uniqueString('sql', resourceGroup().id)]",
-            "metadata": {
-                "description": "The name of the SQL logical server."
-            }
+            "defaultValue": true,
+            "type": "Bool"
         }
     },
-    "functions": [],
-    "variables": {},
     "resources": [
         {
             "type": "Microsoft.Sql/servers",
-            "apiVersion": "2020-02-02-preview",
-            "name": "[parameters('serverName')]",
+            "apiVersion": "2020-11-01-preview",
+            "name": "[parameters('server')]",
             "location": "[parameters('location')]",
             "properties": {
                 "administrators": {
@@ -72,19 +71,64 @@
                     "principalType": "[parameters('aad_admin_type')]",
                     "azureADOnlyAuthentication": "[parameters('aad_only_auth')]"
                 }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2021-02-01-preview",
+            "name": "[concat(parameters('server'), '/sqldb-reviewer')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('server'))]"
+            ],
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic",
+                "capacity": 5
+            },
+            "kind": "v12.0,user",
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": 2147483648,
+                "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                "zoneRedundant": false,
+                "readScale": "Disabled",
+                "requestedBackupStorageRedundancy": "Geo",
+                "isLedgerOn": false
+            }
+        },
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2018-11-30",
+            "name": "id-reviewer-api",
+            "location": "[parameters('location')]"
+        },
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2018-11-30",
+            "name": "id-reviewer-ui",
+            "location": "[parameters('location')]"
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-04-01",
+            "name": "[parameters('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "accessTier": "Hot"
             },
             "resources": [
                 {
-                    "type": "databases",
-                    "apiVersion": "2020-08-01-preview",
-                    "name": "[parameters('sqlDBName')]",
-                    "location": "[parameters('location')]",
-                    "sku": {
-                        "name": "Standard",
-                        "tier": "Basic"
-                    },
+                    "type": "blobServices/containers",
+                    "apiVersion": "2021-04-01",
+                    "name": "[concat('default/', 'images')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Sql/servers', concat(parameters('serverName')))]"
+                        "[parameters('storageAccountName')]"
                     ]
                 }
             ]
@@ -93,27 +137,27 @@
     "outputs": {
         "apiIdentityResourceId": {
             "type": "string",
-            "value": "XXX"
+            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'id-reviewer-api')]"
         },
         "apiIdentityClientId": {
             "type": "string",
-            "value": "XXX"
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'id-reviewer-api')).clientId]"
         },
         "uiIdentityResourceId": {
             "type": "string",
-            "value": "XXX"
+            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'id-reviewer-ui')]"
         },
         "uiIdentityClientId": {
             "type": "string",
-            "value": "XXX"
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'id-reviewer-ui')).clientId]"
         },
         "sqlConnectionString": {
             "type": "string",
-            "value": "XXX"
+            "value": "[concat('Server=tcp:', reference(resourceId('Microsoft.Sql/servers', parameters('server'))).fullyQualifiedDomainName, ',1433;Database=', 'sqldb-reviewer', ';')]"
         },
         "storageURI": {
             "type": "string",
-            "value": "XXX"
+            "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))).primaryEndpoints.blob]"
         }
     }
 }

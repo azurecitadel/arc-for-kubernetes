@@ -10,6 +10,13 @@ on:
         required: true
         default: "AZURE_CREDENTIALS"
         description: The name of the GitHub Secret to use for deployment
+      adminPasswordOrKey:
+        required: true
+        description: SSH Key or password for the Virtual Machine. SSH key is recommended.
+      authenticationType:
+        required: true
+        default: sshPublicKey
+        description: sshPublicKey or password. SSH key is recommended.
 
 jobs:
   deploy:
@@ -34,6 +41,7 @@ jobs:
           echo "::add-mask::$PASSWORD"
           TENANT_ID=$(echo '${{ secrets[github.event.inputs.credentials] }}' | jq -r '.tenantId')
           echo "::add-mask::$TENANT_ID"
+          echo "::add-mask::${{ github.event.inputs.adminPasswordOrKey }}"
 
           # Assume that credentials have limited scope to a single resource group, so just pick the
           # first thing we can access and use that as the resource group to deploy to :)
@@ -42,7 +50,7 @@ jobs:
           SUBSCRIPTION_ID=$(az account show --query 'id' -o tsv)
           echo "::add-mask::$SUBSCRIPTION_ID"
 
-          DEPLOYMENT=$(az deployment group create -g "$RG" -n "${{ github.event_name }}-${GITHUB_SHA:0:7}-${{ github.run_id }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID" githubRepo="$GITHUB_REPOSITORY" branch="${GITHUB_REF##*/}")
+          DEPLOYMENT=$(az deployment group create -g "$RG" -n "${{ github.event_name }}-${GITHUB_SHA:0:7}-${{ github.run_id }}" --template-file "00-setup/azuredeploy.json" --parameters appId="$APP_ID" password="$PASSWORD" tenantId="$TENANT_ID" adminPasswordOrKey="${{ github.event.inputs.adminPasswordOrKey }}" authenticationType="${{ github.event.inputs.authenticationType }}" githubRepo="$GITHUB_REPOSITORY" branch="${GITHUB_REF##*/}")
           SSH_COMMAND=$(echo $DEPLOYMENT | jq -r '.properties.outputs.sshCommand.value')
           echo "::set-output name=ssh_command::$SSH_COMMAND"
           
@@ -54,4 +62,6 @@ jobs:
       - name: Show SSH connection
         run: |
           echo "You can now access your new VM running Kubernetes"
+          echo "Be sure to check Network Security Groups allowing Inbound access to port 22"
+          echo "You will need your SSH public key or password depending on the value of adminPasswordOrKey"
           echo ${{ steps.create_vm.outputs.ssh_command }}
