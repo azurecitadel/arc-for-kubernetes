@@ -51,7 +51,7 @@ echo "Application ID: ${APP_ID}"
 
 ## 3. Create Application Manifests
 
-1. Run the **Deploy Infrastructure** workflow from [GitHub Actions](../../actions) specifying the secret name you added previously e.g. `AZURE_CREDENTIALS_WESTEUROPE` and the values above
+1. Run the **Deploy Infrastructure** workflow from [GitHub Actions](../../../actions/workflows/01-app-infra.yml) specifying the secret name you added previously e.g. `AZURE_CREDENTIALS_WESTEUROPE` and the values above
 2. Download the generated manifest bundle from the run artifacts
 
 > Note: This doesn't actually deploy the application to your cluster as we are controlling that with GitOps. It does however generate the set of manifests that you can directly commit to an Application Developer owned repository.
