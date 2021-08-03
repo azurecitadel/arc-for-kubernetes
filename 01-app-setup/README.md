@@ -50,14 +50,14 @@ echo "Application ID: ${APP_ID}"
 
 ```
 
-## 3. Create Application Manifests
+## 3. Generate Kubernetes Manifests
 
 1. Run the **Deploy Infrastructure** workflow from [GitHub Actions](../../../actions/workflows/01-app-infra.yml) specifying the secret name you added previously e.g. `AZURE_CREDENTIALS_WESTEUROPE` and the values above
 2. Download the generated manifest bundle from the run artifacts
 
 > Note: This doesn't actually deploy the application to your cluster as we are controlling that with GitOps. It does however generate the set of manifests that you can directly commit to an Application Developer owned repository.
 
-## 3. Create SQL Schema
+## 4. Create SQL Schema
 
 All infrastructure will now be provisioned so it's time to create the DB schema. The SQL Server we deployed has [Azure AD Authentication Only](https://docs.microsoft.com/azure/azure-sql/database/authentication-azure-ad-only-authentication?tabs=azure-cli) so without allowing admin access to a group that the GitHub Action also has access to we can't yet deploy changes automatically. This means you will need to log in to your server manually and deploy a few resources to allow the application to work.
 
