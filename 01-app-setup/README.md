@@ -32,20 +32,16 @@ The only reason you must create a new application is so that you have control ov
 
 ```
 # Register Application
-#   reply-urls: Space separated list of redirect URLs - you should add one for each deployment of your application
-APP=$(az ad app create \
-    --display-name="Item Reviewer" \
-    --reply-urls http://localhost:3000 http://localhost:5000 \
-    --available-to-other-tenants=true)
+APP=$(az ad app create --display-name="Item Reviewer" --available-to-other-tenants=true)
 APP_ID=$(echo $APP | jq -r .appId)
 OBJECT_ID=$(echo $APP | jq -r .objectId)
 
-# Update requestedAccessTokenVersion to v2
+# Update requestedAccessTokenVersion to v2 and add SPA reply urls - you should add on more hosts into the `redirectUris` array that correspond to your hosts
 az rest \
     --method PATCH \
     --headers "Content-Type=application/json" \
     --uri "https://graph.microsoft.com/v1.0/applications/${OBJECT_ID}" \
-    --body '{"api":{"requestedAccessTokenVersion":2}}'
+    --body '{"api":{"requestedAccessTokenVersion":2}, "spa":{"redirectUris":["http://localhost:3000", "http://localhost:5000"]}}'
 
 # You will need this when running the Infrastructure deployment
 echo "Application ID: ${APP_ID}"
