@@ -17,4 +17,5 @@ Now you have the clusters set up and connected to Azure you will want to deploy 
 
 1. Create a new repository for the Application Development team in the same Organisation
 2. Generate [infrastructure and deployment resources](01-app-setup)
-3. Use a GitOps approach to deploy the application
+3. Apply SQL changes as a Database Administrator
+4. Use a GitOps approach to deploy the application
