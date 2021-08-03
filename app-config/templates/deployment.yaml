@@ -32,9 +32,9 @@ spec:
           value: "https://login.microsoftonline.com/{{ .Values.tenantId }}/"
         - name: "Authorization.Audience"
           value: "{{ .Values.applicationClientID }}"
-        - name: "Storage:serviceUri"
+        - name: "Storage__serviceUri"
           value: "{{ .Values.storageURI }}"
-        - name: "ConnectionStrings:SQLDBConnectionString"
+        - name: "ConnectionStrings__SQLDBConnectionString"
           value: "{{ .Values.sqlConnectionString }}"
 ---
 apiVersion: apps/v1
