@@ -72,6 +72,8 @@ All infrastructure will now be provisioned so it's time to create the DB schema.
 5. Deploy the [Application Schema](../scripts/schema.sql)
 6. Create [contained users](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/tutorial-windows-vm-access-sql#create-contained-user) by executing the following code
 
+> Note: The exact SQL to execute will be written to the log of the GitHub Action under "Next Steps"
+
 ```sql
 # Replace ... with the output from the GitHub Action
 CREATE USER [...] FROM EXTERNAL PROVIDER;
