@@ -36,7 +36,8 @@ APP=$(az ad app create --display-name="Item Reviewer" --available-to-other-tenan
 APP_ID=$(echo $APP | jq -r .appId)
 OBJECT_ID=$(echo $APP | jq -r .objectId)
 
-# Update requestedAccessTokenVersion to v2 and add SPA reply urls - you should add on more hosts into the `redirectUris` array that correspond to your hosts
+# Update requestedAccessTokenVersion to v2 and add SPA reply urls
+# you should add on more hosts into the `redirectUris` array that correspond to your hosts
 az rest \
     --method PATCH \
     --headers "Content-Type=application/json" \
