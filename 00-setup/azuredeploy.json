@@ -381,7 +381,13 @@
                     "timestamp": 123456789
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'), ' ', subscription().subscriptionId, ' ', resourceGroup().name)]",
+                    "commandToExecute": "[concat('bash install_k3s.sh'
+                        , ' \"', parameters('tenantId'), '\" '
+                        , ' \"', subscription().subscriptionId, '\" '
+                        , ' \"', resourceGroup().name, '\" '
+                        , ' \"', parameters('adminUsername'), '\" '
+                        , ' \"', reference(variables('publicIPAddressName')).ipAddress, '\" '
+                        )]",
                     "fileUris": [
                         "[concat('https://raw.githubusercontent.com/', parameters('githubRepo'), '/', parameters('branch'), '/scripts/install_k3s.sh')]"
                     ]
