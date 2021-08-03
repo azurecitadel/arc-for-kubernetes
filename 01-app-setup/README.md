@@ -70,8 +70,7 @@ All infrastructure will now be provisioned so it's time to create the DB schema.
 
 ![use Azure AD Auth](https://user-images.githubusercontent.com/51163690/127884156-c19f1f00-f90b-4e44-a1d2-9f217cd9fc3b.png)
 
-5. Deploy the [Application Schema](../scripts/schema.sql)
-6. Create [contained users](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/tutorial-windows-vm-access-sql#create-contained-user) by executing the following code
+4. Create [contained users](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/tutorial-windows-vm-access-sql#create-contained-user) by executing the following code
 
 > Note: The exact SQL to execute will be written to the log of the GitHub Action under "Next Steps"
 
@@ -81,6 +80,8 @@ CREATE USER [...] FROM EXTERNAL PROVIDER;
 ALTER ROLE db_datareader ADD MEMBER [...];
 ALTER ROLE db_datawriter ADD MEMBER [...];
 ```
+
+5. If you haven't already, then also deploy the [Application Schema](../scripts/schema.sql). It is included in the "Next Steps" output above
 
 # Troubleshooting
 
