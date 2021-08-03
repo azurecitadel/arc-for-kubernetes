@@ -12,7 +12,7 @@ sqlConnectionString: PLACEHOLDER_SQL_CONNECTION_STRING
 
 release:
   repo: jasoncabot-ms/reviewer
-  name: v1.4
+  name: v1.5
 
 identity:
   api:
