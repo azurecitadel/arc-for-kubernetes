@@ -65,3 +65,5 @@ spec:
           value: "{{ .Values.applicationClientID }}"
         - name: "AUTHORITY"
           value: "https://login.microsoftonline.com/{{ .Values.tenantId }}"
+        - name: "SCOPE"
+          value: "api://{{ .Values.applicationClientID }}/user_impersonation"

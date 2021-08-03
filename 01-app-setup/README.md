@@ -32,17 +32,18 @@ The only reason you must create a new application is so that you have control ov
 
 ```
 # Register Application
-APP=$(az ad app create --display-name="Item Reviewer" --available-to-other-tenants=true)
+SUFFIX=$RANDOM
+APP=$(az ad app create --display-name="Item Reviewer $SUFFIX" --available-to-other-tenants=true)
 APP_ID=$(echo $APP | jq -r .appId)
 OBJECT_ID=$(echo $APP | jq -r .objectId)
 
-# Update requestedAccessTokenVersion to v2 and add SPA reply urls
+# Update requestedAccessTokenVersion to v2, add SPA reply urls and set application URI
 # you should add on more hosts into the `redirectUris` array that correspond to your hosts
 az rest \
     --method PATCH \
     --headers "Content-Type=application/json" \
     --uri "https://graph.microsoft.com/v1.0/applications/${OBJECT_ID}" \
-    --body '{"api":{"requestedAccessTokenVersion":2}, "spa":{"redirectUris":["http://localhost:3000", "http://localhost:5000"]}}'
+    --body "{\"api\":{\"requestedAccessTokenVersion\":2}, \"identifierUris\":[\"api://${APP_ID}\"], \"spa\":{\"redirectUris\":[\"http://localhost:3000\", \"http://localhost:5000\"]}}"
 
 # You will need this when running the Infrastructure deployment
 echo "Application ID: ${APP_ID}"
@@ -78,6 +79,7 @@ All infrastructure will now be provisioned so it's time to create the DB schema.
 # Replace ... with the output from the GitHub Action
 CREATE USER [...] FROM EXTERNAL PROVIDER;
 ALTER ROLE db_datareader ADD MEMBER [...];
+ALTER ROLE db_datawriter ADD MEMBER [...];
 ```
 
 # Troubleshooting

@@ -118,4 +118,5 @@ jobs:
           echo "Run the following SQL to allow access from the API"
           echo "CREATE USER [${{ steps.deploy_infrastructure.outputs.apiIdentityName }}] FROM EXTERNAL PROVIDER;"
           echo "ALTER ROLE db_datareader ADD MEMBER [${{ steps.deploy_infrastructure.outputs.apiIdentityName }}];"
+          echo "ALTER ROLE db_datawriter ADD MEMBER [${{ steps.deploy_infrastructure.outputs.apiIdentityName }}];"
           cat ./scripts/schema.sql
