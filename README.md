@@ -6,10 +6,13 @@ You will create a child repository from this template and use it as a basis of y
 
 The rest of the contents are divided into two halves, firstly the unmanaged cluster set up that will provision between 1..n Kubernetes clusters
 
-# Challenge 1
+# Challenge 0
 
 1. Create a child of this repository in your own organisation
-2. Follow the instructions to [create unmanaged clusters](00-setup)
+
+# Challenge 1
+
+1. Follow the instructions to [create unmanaged clusters](00-setup)
 
 # Challenge 4
 
