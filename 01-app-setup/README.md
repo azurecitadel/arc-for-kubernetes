@@ -81,7 +81,7 @@ ALTER ROLE db_datareader ADD MEMBER [...];
 ALTER ROLE db_datawriter ADD MEMBER [...];
 ```
 
-5. If you haven't already, then also deploy the [Application Schema](../scripts/schema.sql). It is included in the "Next Steps" output above
+5. If you haven't already, then also deploy the [Application Schema](../scripts/schema.sql). It is included in the **Next Steps** output above
 
 # Troubleshooting
 
