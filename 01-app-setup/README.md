@@ -39,11 +39,12 @@ OBJECT_ID=$(echo $APP | jq -r .objectId)
 
 # Update requestedAccessTokenVersion to v2, add SPA reply urls and set application URI
 # you should add on more hosts into the `redirectUris` array that correspond to your hosts
+REDIRECT_URIS=$(az network public-ip list --query "[?name=='Arc-K3s-Demo-PIP'].join('', ['https://', dnsSettings.fqdn])" -o json)
 az rest \
     --method PATCH \
     --headers "Content-Type=application/json" \
     --uri "https://graph.microsoft.com/v1.0/applications/${OBJECT_ID}" \
-    --body "{\"api\":{\"requestedAccessTokenVersion\":2}, \"identifierUris\":[\"api://${APP_ID}\"], \"spa\":{\"redirectUris\":[\"http://localhost:3000\", \"http://localhost:5000\"]}}"
+    --body "{\"api\":{\"requestedAccessTokenVersion\":2}, \"identifierUris\":[\"api://${APP_ID}\"], \"spa\":{\"redirectUris\":$REDIRECT_URIS}}"
 
 # You will need this when running the Infrastructure deployment
 echo "Application ID: ${APP_ID}"
