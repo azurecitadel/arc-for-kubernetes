@@ -37,7 +37,7 @@ As an example, your GitHub repository should appear like this
 ## Deploy Kubernetes using GitHub
 
 5. (recommended) Find your Public SSH Key for access to the cluster by running `cat ~/.ssh/id_*.pub`
->  If you haven't got one, [generate a new public SSH key](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed#generate-keys-with-ssh-keygen) `ssh-keygen -t rsa -b 4096 -C "yourname@example.com" -f $HOME/.ssh/arc-for-kubernetes`
+>  If you haven't got one, [generate a new public SSH key](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed#generate-keys-with-ssh-keygen) `ssh-keygen -t rsa -b 4096 -C "yourname@example.com" -f $HOME/.ssh/id_arc-for-kubernetes`
 6. Run the **Deploy Cluster** workflow from [GitHub Actions](../../../actions/workflows/00-k3s-cluster.yml) specifying the secret name you added in step 4
 
 ![run workflow](https://user-images.githubusercontent.com/51163690/127879459-6cfb03da-71a5-483c-923d-a18423ec6bb4.png)
