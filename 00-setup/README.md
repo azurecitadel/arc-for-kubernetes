@@ -15,8 +15,12 @@ LOCATION=westeurope
 
 ## Create a new resource group
 ```bash
-RG_ID=$(az group create -n "arc4k8s-${LOCATION}" -l "${LOCATION}" -o tsv --query 'id')
-AZURE_CREDENTIALS=$(az ad sp create-for-rbac --sdk-auth --role Owner --name http://arc4k8s-ghaction-$LOCATION --scopes $RG_ID)
+SUB_ID=$(az account show --query id -o tsv)
+RG_NAME="arc4k8s-${LOCATION}"
+
+RG_ID=$(az group create -n "${RG_NAME}" -l "${LOCATION}" -o tsv --query 'id')
+
+AZURE_CREDENTIALS=$(az ad sp create-for-rbac --sdk-auth --role Owner --name "http://gh-${SUB_ID}-${RG_NAME}" --scopes "${RG_ID}")
 
 echo "Copy this output into a GitHub secret with the name: 'AZURE_CREDENTIALS_${LOCATION^^}'"
 echo "You will use this to allow GitHub to deploy the appropriate resources"
