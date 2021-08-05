@@ -16,6 +16,9 @@ sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo cp kubeconfig /home/${ADMIN_USERNAME}/.kube/config
 chown -R $ADMIN_USERNAME /home/${ADMIN_USERNAME}/.kube/
 
+# Ensure default namespace is labelled
+kubectl label ns kube-system name=kube-system
+
 # Set up Managed Identity
 sudo rm -rf "/etc/kubernetes/azure.json"
 sudo mkdir -p "/etc/kubernetes/"
